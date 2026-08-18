@@ -123,7 +123,7 @@ export default function AuthPage() {
               {mode === "register" && (
                 <div>
                   <Label htmlFor="name">الاسم بالكامل <span className="text-red-600">*</span></Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: ياسمين محمود"
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: بنين كاظم"
                     className={cn("mt-1.5", errors.name && "border-red-500")} aria-invalid={!!errors.name} />
                   {err("name")}
                 </div>

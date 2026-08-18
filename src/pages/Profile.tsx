@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { MapPin, PenLine, Settings2, Users, Package, Heart, Shirt } from "lucide-react";
 import { useApp } from "@/context/AppContext";
@@ -11,15 +11,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 
 export default function ProfilePage() {
-  const { user, orders, favorites, follows } = useApp();
+  const { user, orders, favorites, follows, updateProfile } = useApp();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio);
   const [city, setCity] = useState(user.city);
+
+  useEffect(() => {
+    setName(user.name);
+    setBio(user.bio);
+    setCity(user.city);
+  }, [user.name, user.bio, user.city]);
 
   const myDesigns = designs.slice(0, 2);
   const followersList = designers.slice(0, 4);
@@ -160,7 +165,10 @@ export default function ProfilePage() {
               <Label htmlFor="pcity">المدينة</Label>
               <Input id="pcity" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1.5" />
             </div>
-            <Button className="w-full bg-plum text-cream hover:bg-plum-light" onClick={() => { setEditOpen(false); toast.success("تم حفظ التعديلات"); }}>
+            <Button className="w-full bg-plum text-cream hover:bg-plum-light" onClick={() => {
+              updateProfile({ name, bio, city });
+              setEditOpen(false);
+            }}>
               حفظ التعديلات
             </Button>
           </div>

@@ -1,11 +1,11 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import type { CartItem, Conversation, AppNotification, Order } from "@/types";
 import { initialCart, initialConversations, initialNotifications, initialOrders } from "@/data/mockData";
 
 export type AccountType = "عميل" | "خياط" | "مصمم أزياء" | "شركة ملابس" | "متجر مستلزمات";
 
-interface User {
+export interface User {
   name: string;
   username: string;
   bio: string;
@@ -14,11 +14,32 @@ interface User {
   accountType: AccountType;
 }
 
+export const DEFAULT_USER_PROFILE: User = {
+  name: "بنين كاظم",
+  username: "@banen_k",
+  bio: "عاشقة للأزياء والتصاميم الراقية 🎀",
+  city: "البصرة",
+  rating: 4.8,
+  accountType: "عميل",
+};
+
+export function sanitizeUser(userData?: Partial<User> | null): User {
+  return {
+    name: userData?.name && userData.name.trim() !== "" ? userData.name : DEFAULT_USER_PROFILE.name,
+    username: userData?.username && userData.username.trim() !== "" ? userData.username : DEFAULT_USER_PROFILE.username,
+    bio: userData?.bio && userData.bio.trim() !== "" ? userData.bio : DEFAULT_USER_PROFILE.bio,
+    city: userData?.city && userData.city.trim() !== "" ? userData.city : DEFAULT_USER_PROFILE.city,
+    rating: userData?.rating ?? DEFAULT_USER_PROFILE.rating,
+    accountType: userData?.accountType ?? DEFAULT_USER_PROFILE.accountType,
+  };
+}
+
 interface AppState {
   user: User;
   isAuthed: boolean;
   login: (name?: string, type?: AccountType) => void;
   logout: () => void;
+  updateProfile: (updates: Partial<User>) => void;
   cart: CartItem[];
   addToCart: (item: Omit<CartItem, "qty">, qty?: number) => void;
   removeFromCart: (id: string) => void;
@@ -46,14 +67,30 @@ const Ctx = createContext<AppState | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [isAuthed, setIsAuthed] = useState(false);
-  const [user, setUser] = useState<User>({
-    name: "ياسمين محمود",
-    username: "@yasmin_m",
-    bio: "عاشقة للأزياء والتصاميم الراقية ✂️",
-    city: "الجيزة",
-    rating: 4.8,
-    accountType: "عميل",
+  const [user, setUser] = useState<User>(() => {
+    try {
+      const saved = localStorage.getItem("khayat_user_profile");
+      if (saved) {
+        return sanitizeUser(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Failed to parse user state", e);
+    }
+    return sanitizeUser(null);
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("khayat_user_profile", JSON.stringify(user));
+    } catch (e) {
+      console.error("Failed to save user state", e);
+    }
+  }, [user]);
+
+  const updateProfile = useCallback((updates: Partial<User>) => {
+    setUser((prev) => sanitizeUser({ ...prev, ...updates }));
+  }, []);
+
   const [cart, setCart] = useState<CartItem[]>(initialCart);
   const [favorites, setFavorites] = useState<string[]>(["p2", "p5", "d1", "c4", "f1"]);
   const [follows, setFollows] = useState<string[]>(["d5"]);
@@ -63,7 +100,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback((name?: string, type?: AccountType) => {
     setIsAuthed(true);
-    if (name) setUser((u) => ({ ...u, name, accountType: type ?? u.accountType }));
+    setUser((prev) =>
+      sanitizeUser({
+        ...prev,
+        name: name && name.trim() !== "" ? name : prev.name,
+        accountType: type ?? prev.accountType,
+      })
+    );
     toast.success("تم تسجيل الدخول بنجاح", { description: "أهلًا بك في منصة خياط" });
   }, []);
 
@@ -152,7 +195,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AppState>(
     () => ({
-      user, isAuthed, login, logout,
+      user, isAuthed, login, logout, updateProfile,
       cart, addToCart, removeFromCart, updateQty, clearCart,
       favorites, toggleFavorite, isFavorite,
       follows, toggleFollow, isFollowing,
@@ -163,7 +206,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       unreadNotifications: notifications.filter((n) => !n.read).length,
       unreadMessages: conversations.reduce((s, c) => s + c.unread, 0),
     }),
-    [user, isAuthed, login, logout, cart, addToCart, removeFromCart, updateQty, clearCart, favorites, toggleFavorite, isFavorite, follows, toggleFollow, isFollowing, notifications, markAllRead, markRead, conversations, sendMessage, orders, addOrder]
+    [user, isAuthed, login, logout, updateProfile, cart, addToCart, removeFromCart, updateQty, clearCart, favorites, toggleFavorite, isFavorite, follows, toggleFollow, isFollowing, notifications, markAllRead, markRead, conversations, sendMessage, orders, addOrder]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
