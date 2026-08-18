@@ -30,7 +30,7 @@ export const designers: Designer[] = [
   { id: "d6", name: "خالد مراد", username: "@khaled_mourad", specialty: "قمصان وملابس رجالية", rating: 4.5, reviewsCount: 431, followers: 7800, city: "طنطا", bio: "تفصيل قمصان وأطقم رجالية بمقاسات دقيقة وخدمة تعديل مجانية.", verified: false },
 ];
 
-const img = (n: string) => `/images/${n}`;
+const img = (n: string) => `${import.meta.env.BASE_URL}images/${n}`;
 
 export const designs: Design[] = [
   { id: "p1", title: "فستان سهرة مخملي بتطريز ذهبي", designerId: "d1", category: "فساتين", price: 2850, discountPrice: 2280, rating: 4.9, reviewsCount: 128, image: img("design-evening-dress.jpg"), colors: ["#5B2333", "#1F2A44", "#1C1A1C"], sizes: ["S", "M", "L"], materials: ["مخمل إيطالي", "خيوط تطريز ذهبية", "بطانة حرير"], description: "فستان سهرة فاخر من المخمل الإيطالي بلون عنابي عميق، مزيّن بتطريز ذهبي يدوي على الصدر والأكمام. قصّة انسيابية تناسب جميع القوام، مع بطانة حرير ناعمة.", city: "القاهرة", deliveryDays: "٥ - ٧ أيام عمل", tags: ["سهرة", "مخمل", "تطريز"], isNew: true },

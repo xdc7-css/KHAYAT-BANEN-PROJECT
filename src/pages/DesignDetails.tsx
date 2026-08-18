@@ -18,7 +18,7 @@ export default function DesignDetailsPage() {
   const [selectedSize, setSelectedSize] = useState(0);
   const [galleryIndex, setGalleryIndex] = useState(0);
 
-  const gallery = useMemo(() => (design ? [design.image, "/images/hero.jpg", designs[(designs.indexOf(design) + 1) % designs.length].image] : []), [design]);
+  const gallery = useMemo(() => (design ? [design.image, `${import.meta.env.BASE_URL}images/hero.jpg`, designs[(designs.indexOf(design) + 1) % designs.length].image] : []), [design]);
 
   if (!design) {
     return (

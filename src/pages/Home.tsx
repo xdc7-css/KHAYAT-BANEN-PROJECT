@@ -29,7 +29,7 @@ export default function HomePage() {
     <div className="space-y-10">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl card-shadow-lg">
-        <img src="/images/hero.jpg" alt="مشغل خياطة فاخر" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={`${import.meta.env.BASE_URL}images/hero.jpg`} alt="مشغل خياطة فاخر" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-l from-plum/90 via-plum/60 to-plum/20" />
         <div className="relative z-10 flex min-h-[340px] flex-col justify-center gap-5 p-6 md:min-h-[420px] md:p-12">
           <h1 className="max-w-xl text-2xl font-black leading-snug text-cream text-balance md:text-4xl">
